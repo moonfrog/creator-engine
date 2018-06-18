@@ -194,7 +194,7 @@ var Canvas = cc.Class({
             eventManager.addListener(this._thisOnResized, 1);
         }
 
-        this.applySettings();
+        // this.applySettings();
         this.onResized();
     },
 

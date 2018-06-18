@@ -686,7 +686,7 @@ else {
     sys.language = currLanguage;
 
     // Get the os of system
-    var isAndroid = false, iOS = false, osVersion = '', osMainVersion = 0;
+    var isAndroid = false, iOS = false, osVersion = '', osMainVersion = 0, isIpad = false;
     var uaResult = /android (\d+(?:\.\d+)+)/i.exec(ua) || /android (\d+(?:\.\d+)+)/i.exec(nav.platform);
     if (uaResult) {
         isAndroid = true;
@@ -694,16 +694,19 @@ else {
         osMainVersion = parseInt(osVersion) || 0;
     }
     uaResult = /(iPad|iPhone|iPod).*OS ((\d+_?){2,3})/i.exec(ua);
+    isIpad = (/(iPad).*OS ((\d+_?){2,3})/i.exec(ua)) ?  true : false;
     if (uaResult) {
         iOS = true;
         osVersion = uaResult[2] || '';
         osMainVersion = parseInt(osVersion) || 0;
-    } 
+    }
     else if (/(iPhone|iPad|iPod)/.exec(nav.platform)) {
         iOS = true;
         osVersion = '';
         osMainVersion = 0;
+        isIpad = (/(iPad)/.exec(nav.platform)) ? true : false;
     }
+    sys.isIpad = isIpad;
 
     var osName = sys.OS_UNKNOWN;
     if (nav.appVersion.indexOf("Win") !== -1) osName = sys.OS_WINDOWS;
@@ -821,6 +824,15 @@ else {
     })();
 
     // Adjust mobile css settings
+    sys.ipadRes = false;
+    if (cc.sys.isMobile) {
+        if (sys.os == sys.OS_IOS) {
+            sys.ipadRes = (cc.sys.isIpad) ?  true : false;
+        } else {
+            var size = sys.windowPixelResolution.height / sys.windowPixelResolution.width;
+            sys.ipadRes = size < 1.5;
+        }
+    }
     if (cc.sys.isMobile) {
         var fontStyle = document.createElement("style");
         fontStyle.type = "text/css";

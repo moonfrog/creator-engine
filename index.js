@@ -180,7 +180,7 @@ if (!(CC_EDITOR && Editor.isMainProcess)) {
     require('./polyfill/typescript');
 }
 
-require('./cocos2d/kazmath');
+//require('./cocos2d/kazmath');
 require('./cocos2d/core/predefine');
 
 ccs = {};

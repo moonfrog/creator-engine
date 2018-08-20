@@ -39,7 +39,7 @@ function adjustEditBoxPosition (editBox, nodeParent) {
     var worldPos = editBox.convertToWorldSpace(cc.p(0,0));
     var windowHeight = cc.visibleRect.height;
     var windowWidth = cc.visibleRect.width;
-    var factor = 0.6;
+    var factor = 0.55;
     if(windowWidth > windowHeight) {
         factor = 0.7;
     }
@@ -297,6 +297,12 @@ _ccsg.EditBox = _ccsg.Node.extend({
         }
     },
 
+    onEventBlur: function() {
+        if(this._renderCmd._edTxt) {
+            this._renderCmd._onEventBlur();
+        }
+    },
+
     setTabIndex: function(index) {
         if(this._renderCmd._edTxt) {
             this._renderCmd._edTxt.tabIndex = index;
@@ -405,6 +411,7 @@ _ccsg.EditBox = _ccsg.Node.extend({
         if (text.length >= this._maxLength) {
             text = text.slice(0, this._maxLength);
         }
+        console.log("eagle setstring is " + text);
         this._text = text;
         this._renderCmd.setString(text);
     },
@@ -615,6 +622,7 @@ _ccsg.EditBox.KeyboardReturnType = KeyboardReturnType;
     };
 
     proto.stayOnTop = function (flag) {
+        console.log("eagle stayontop is " + flag);
         if(flag) {
             this._removeLabels();
             this._edTxt.style.display = '';
@@ -679,7 +687,7 @@ _ccsg.EditBox.KeyboardReturnType = KeyboardReturnType;
             policy.apply(cc.view, cc.view.getDesignResolutionSize());
             cc.view._isRotated = true;
             //use window scrollTo to adjust the input area
-            window.scrollTo(35, 35);
+            // window.scrollTo(35, 35);
             this.__rotateScreen = true;
         } else {
             this.__rotateScreen = false;
@@ -722,6 +730,7 @@ _ccsg.EditBox.KeyboardReturnType = KeyboardReturnType;
                 target.value = target.value.slice(0, target.maxLength);
             }
 
+            console.log("eagle editBox4 is " + target.value);
             if (editBox._delegate && editBox._delegate.editBoxTextChanged) {
                 if (editBox._text !== target.value) {
                     editBox._text = target.value;
@@ -743,7 +752,8 @@ _ccsg.EditBox.KeyboardReturnType = KeyboardReturnType;
 
         tmpEdTxt.addEventListener('input', function () {
             if (inputLock) {
-                return;
+                console.log("eagle input lock is here bitches");
+                // return;
             }
             _inputValueHandle(this);
         });
@@ -784,26 +794,29 @@ _ccsg.EditBox.KeyboardReturnType = KeyboardReturnType;
                 editBox._delegate.editBoxEditingDidBegan(editBox);
             }
         });
-        tmpEdTxt.addEventListener('blur', function () {
-            var editBox = thisPointer._editBox;
-            editBox._text = this.value;
-            thisPointer._updateDomTextCases();
-
-            if (editBox._delegate && editBox._delegate.editBoxEditingDidEnded) {
-                editBox._delegate.editBoxEditingDidEnded(editBox);
-            }
-
-            if (this.value === '') {
-                this.style.fontSize = editBox._placeholderFontSize + 'px';
-                this.style.color = cc.colorToHex(editBox._placeholderColor);
-            }
-            thisPointer._endEditing();
-        });
+        tmpEdTxt.addEventListener('blur', thisPointer._onEventBlur.bind(thisPointer));
 
         this._addDomToGameContainer();
 
         return tmpEdTxt;
     };
+
+    proto._onEventBlur = function () {
+        if (this._editingMode) return;
+        var editBox = this._editBox;
+        editBox._text = this.value;
+        this._updateDomTextCases();
+
+        if (editBox._delegate && editBox._delegate.editBoxEditingDidEnded) {
+            editBox._delegate.editBoxEditingDidEnded(editBox);
+        }
+
+        if (this.value === '') {
+            this.style.fontSize = editBox._placeholderFontSize + 'px';
+            this.style.color = cc.colorToHex(editBox._placeholderColor);
+        }
+        this._endEditing();
+    }
 
     proto._createDomTextArea = function () {
         this.removeDom();
@@ -835,6 +848,7 @@ _ccsg.EditBox.KeyboardReturnType = KeyboardReturnType;
             }
 
             var editBox = thisPointer._editBox;
+            console.log("eagle editBox is " + target.value);
             if (editBox._delegate && editBox._delegate.editBoxTextChanged) {
                 if(editBox._text.toLowerCase() !== target.value.toLowerCase()) {
                     editBox._text = target.value;
@@ -856,7 +870,8 @@ _ccsg.EditBox.KeyboardReturnType = KeyboardReturnType;
 
         tmpEdTxt.addEventListener('input', function () {
             if (inputLock) {
-                return;
+                console.log("eagle input lock is here");
+                // return;
             }
             _inputValueHandle(this);
         });
@@ -921,6 +936,7 @@ _ccsg.EditBox.KeyboardReturnType = KeyboardReturnType;
 
         proto._onBKTextChange = function (text) {
             var editBox = this._editBox;
+            console.log("eagle editBox2 is " + text);
             if (editBox._delegate && editBox._delegate.editBoxTextChanged && editBox._text !== text) {
                 editBox._text = text;
                 this._updateDomTextCases();
@@ -1096,8 +1112,10 @@ _ccsg.EditBox.KeyboardReturnType = KeyboardReturnType;
             }
         }
         else {
+            console.log("eagle text is not empty");
             if(this._textLabel) {
                 this._textLabel.setVisible(true);
+                console.log("eagle text set to not empty");
                 this._textLabel.setString(this._editBox._text);
             }
         }

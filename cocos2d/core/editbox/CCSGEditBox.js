@@ -44,18 +44,14 @@ function adjustEditBoxPosition (editBox, nodeParent) {
         factor = 0.7;
     }
     setTimeout(function() {
-        console.log("eagle windo scroll y is " + window.scrollY +  "  scl" + SCROLLY + " world y is " + worldPos.y + " windowHeight is " + windowHeight + "  factor is " + factor);
         if(window.scrollY < SCROLLY && worldPos.y < windowHeight * factor) {
             var scrollOffset = windowHeight * factor - worldPos.y - window.scrollY;
-            console.log("eagle good scrollOffset is " + scrollOffset);
             if (scrollOffset < 35) scrollOffset = 35;
             if (scrollOffset > 320) scrollOffset = 320;
 
             if (nodeParent) {
-                console.log("eagle node parent is not null");
                 nodeParent.setPosition(nodeParent.getPositionX(), nodeParent.getPositionY() + scrollOffset);
             } else {
-                console.log("eagle node parent is null");
             }
         }
     }, DELAY_TIME);
@@ -411,7 +407,6 @@ _ccsg.EditBox = _ccsg.Node.extend({
         if (text.length >= this._maxLength) {
             text = text.slice(0, this._maxLength);
         }
-        console.log("eagle setstring is " + text);
         this._text = text;
         this._renderCmd.setString(text);
     },
@@ -622,7 +617,6 @@ _ccsg.EditBox.KeyboardReturnType = KeyboardReturnType;
     };
 
     proto.stayOnTop = function (flag) {
-        console.log("eagle stayontop is " + flag);
         if(flag) {
             this._removeLabels();
             this._edTxt.style.display = '';
@@ -692,7 +686,6 @@ _ccsg.EditBox.KeyboardReturnType = KeyboardReturnType;
         } else {
             this.__rotateScreen = false;
         }
-        console.log("eagle this is focus on mobile");
         this._editingMode = true;
         adjustEditBoxPosition(editBox, editBox._parentNodeForRepositioning);
     };
@@ -730,7 +723,6 @@ _ccsg.EditBox.KeyboardReturnType = KeyboardReturnType;
                 target.value = target.value.slice(0, target.maxLength);
             }
 
-            console.log("eagle editBox4 is " + target.value);
             if (editBox._delegate && editBox._delegate.editBoxTextChanged) {
                 if (editBox._text !== target.value) {
                     editBox._text = target.value;
@@ -752,7 +744,6 @@ _ccsg.EditBox.KeyboardReturnType = KeyboardReturnType;
 
         tmpEdTxt.addEventListener('input', function () {
             if (inputLock) {
-                console.log("eagle input lock is here bitches");
                 // return;
             }
             _inputValueHandle(this);
@@ -848,7 +839,6 @@ _ccsg.EditBox.KeyboardReturnType = KeyboardReturnType;
             }
 
             var editBox = thisPointer._editBox;
-            console.log("eagle editBox is " + target.value);
             if (editBox._delegate && editBox._delegate.editBoxTextChanged) {
                 if(editBox._text.toLowerCase() !== target.value.toLowerCase()) {
                     editBox._text = target.value;
@@ -870,7 +860,6 @@ _ccsg.EditBox.KeyboardReturnType = KeyboardReturnType;
 
         tmpEdTxt.addEventListener('input', function () {
             if (inputLock) {
-                console.log("eagle input lock is here");
                 // return;
             }
             _inputValueHandle(this);
@@ -936,7 +925,6 @@ _ccsg.EditBox.KeyboardReturnType = KeyboardReturnType;
 
         proto._onBKTextChange = function (text) {
             var editBox = this._editBox;
-            console.log("eagle editBox2 is " + text);
             if (editBox._delegate && editBox._delegate.editBoxTextChanged && editBox._text !== text) {
                 editBox._text = text;
                 this._updateDomTextCases();
@@ -1112,10 +1100,8 @@ _ccsg.EditBox.KeyboardReturnType = KeyboardReturnType;
             }
         }
         else {
-            console.log("eagle text is not empty");
             if(this._textLabel) {
                 this._textLabel.setVisible(true);
-                console.log("eagle text set to not empty");
                 this._textLabel.setString(this._editBox._text);
             }
         }

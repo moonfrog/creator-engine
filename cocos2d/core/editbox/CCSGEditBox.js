@@ -29,17 +29,17 @@
 // https://segmentfault.com/q/1010000002914610
 var SCROLLY = 40;
 var LEFT_PADDING = 2;
-var DELAY_TIME = 400;
+var DELAY_TIME = 100;
 var FOCUS_DELAY_UC = 400;
 var FOCUS_DELAY_FIREFOX = 0;
 var Utils = require('../platform/utils');
 var sys = require('../platform/CCSys');
 
-function adjustEditBoxPosition (editBox) {
+function adjustEditBoxPosition (editBox, nodeParent) {
     var worldPos = editBox.convertToWorldSpace(cc.p(0,0));
     var windowHeight = cc.visibleRect.height;
     var windowWidth = cc.visibleRect.width;
-    var factor = 0.5;
+    var factor = 0.55;
     if(windowWidth > windowHeight) {
         factor = 0.7;
     }
@@ -48,7 +48,10 @@ function adjustEditBoxPosition (editBox) {
             var scrollOffset = windowHeight * factor - worldPos.y - window.scrollY;
             if (scrollOffset < 35) scrollOffset = 35;
             if (scrollOffset > 320) scrollOffset = 320;
-            window.scrollTo(scrollOffset, scrollOffset);
+
+            if (nodeParent) {
+                nodeParent.setPosition(nodeParent.getPositionX(), nodeParent.getPositionY() + scrollOffset);
+            }
         }
     }, DELAY_TIME);
 }
@@ -289,10 +292,22 @@ _ccsg.EditBox = _ccsg.Node.extend({
         }
     },
 
+    onEventBlur: function() {
+        if(this._renderCmd._edTxt) {
+            this._renderCmd._onEventBlur();
+        }
+    },
+
     setTabIndex: function(index) {
         if(this._renderCmd._edTxt) {
             this._renderCmd._edTxt.tabIndex = index;
         }
+    },
+
+    setParentNodeForRepositioning: function (parentNode) {
+        this._parentNodeForRepositioning = parentNode;
+        this._parentNodeX = this._parentNodeForRepositioning.getPositionX();
+        this._parentNodeY = this._parentNodeForRepositioning.getPositionY();
     },
 
     getTabIndex: function() {
@@ -614,7 +629,7 @@ _ccsg.EditBox.KeyboardReturnType = KeyboardReturnType;
     // Called before editbox focus to register cc.view status
     proto._beginEditingOnMobile = function (editBox) {
         this.__orientationChanged = function () {
-            adjustEditBoxPosition(editBox);
+            adjustEditBoxPosition(editBox, editBox._parentNodeForRepositioning);
         };
 
         window.addEventListener('orientationchange', this.__orientationChanged);
@@ -630,7 +645,7 @@ _ccsg.EditBox.KeyboardReturnType = KeyboardReturnType;
         cc.view.resizeWithBrowserSize(false);
     };
     // Called after keyboard disappeared to readapte the game view
-    proto._endEditingOnMobile = function () {
+    proto._endEditingOnMobile = function (parentNodeForRepositioning, nodex, nodey) {
         if (this.__rotateScreen) {
             cc.container.style['-webkit-transform'] = 'rotate(90deg)';
             cc.container.style.transform = 'rotate(90deg)';
@@ -646,7 +661,8 @@ _ccsg.EditBox.KeyboardReturnType = KeyboardReturnType;
 
         window.removeEventListener('orientationchange', this.__orientationChanged);
 
-        window.scrollTo(0, 0);
+        // window.scrollTo(0, 0);
+        parentNodeForRepositioning.setPosition(nodex, nodey);
         if(this.__fullscreen) {
             cc.view.enableAutoFullScreen(true);
         }
@@ -664,12 +680,13 @@ _ccsg.EditBox.KeyboardReturnType = KeyboardReturnType;
             policy.apply(cc.view, cc.view.getDesignResolutionSize());
             cc.view._isRotated = true;
             //use window scrollTo to adjust the input area
-            window.scrollTo(35, 35);
+            // window.scrollTo(35, 35);
             this.__rotateScreen = true;
         } else {
             this.__rotateScreen = false;
         }
-        adjustEditBoxPosition(editBox);
+        this._editingMode = true;
+        adjustEditBoxPosition(editBox, editBox._parentNodeForRepositioning);
     };
 
 
@@ -726,7 +743,7 @@ _ccsg.EditBox.KeyboardReturnType = KeyboardReturnType;
 
         tmpEdTxt.addEventListener('input', function () {
             if (inputLock) {
-                return;
+                // return;
             }
             _inputValueHandle(this);
         });
@@ -767,26 +784,29 @@ _ccsg.EditBox.KeyboardReturnType = KeyboardReturnType;
                 editBox._delegate.editBoxEditingDidBegan(editBox);
             }
         });
-        tmpEdTxt.addEventListener('blur', function () {
-            var editBox = thisPointer._editBox;
-            editBox._text = this.value;
-            thisPointer._updateDomTextCases();
-
-            if (editBox._delegate && editBox._delegate.editBoxEditingDidEnded) {
-                editBox._delegate.editBoxEditingDidEnded(editBox);
-            }
-
-            if (this.value === '') {
-                this.style.fontSize = editBox._placeholderFontSize + 'px';
-                this.style.color = cc.colorToHex(editBox._placeholderColor);
-            }
-            thisPointer._endEditing();
-        });
+        tmpEdTxt.addEventListener('blur', thisPointer._onEventBlur.bind(thisPointer));
 
         this._addDomToGameContainer();
 
         return tmpEdTxt;
     };
+
+    proto._onEventBlur = function () {
+        if (this._editingMode) return;
+        var editBox = this._editBox;
+        editBox._text = this.value;
+        this._updateDomTextCases();
+
+        if (editBox._delegate && editBox._delegate.editBoxEditingDidEnded) {
+            editBox._delegate.editBoxEditingDidEnded(editBox);
+        }
+
+        if (this.value === '') {
+            this.style.fontSize = editBox._placeholderFontSize + 'px';
+            this.style.color = cc.colorToHex(editBox._placeholderColor);
+        }
+        this._endEditing();
+    }
 
     proto._createDomTextArea = function () {
         this.removeDom();
@@ -839,7 +859,7 @@ _ccsg.EditBox.KeyboardReturnType = KeyboardReturnType;
 
         tmpEdTxt.addEventListener('input', function () {
             if (inputLock) {
-                return;
+                // return;
             }
             _inputValueHandle(this);
         });
@@ -1129,7 +1149,9 @@ _ccsg.EditBox.KeyboardReturnType = KeyboardReturnType;
             var self = this;
             // Delay end editing adaptation to ensure virtual keyboard is disapeared
             setTimeout(function () {
-                self._endEditingOnMobile();
+                self._endEditingOnMobile(self._editBox._parentNodeForRepositioning, 
+                                        self._editBox._parentNodeX, 
+                                        self._editBox._parentNodeY);
             }, DELAY_TIME);
         }
         this._editingMode = false;

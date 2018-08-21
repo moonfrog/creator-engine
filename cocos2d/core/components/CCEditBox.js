@@ -440,6 +440,14 @@ var EditBox = cc.Class({
         InputMode: InputMode
     },
 
+    setParentNodeForRepositioning: function (parentNode) {
+        this._sgNode.setParentNodeForRepositioning(parentNode);
+    },
+
+    onEventBlur: function () {
+        this._sgNode.onEventBlur();
+    },
+
     _applyCapInset: function (sprite) {
         var backgroundImage = this.backgroundImage;
         sprite.setInsetTop(backgroundImage.insetTop);

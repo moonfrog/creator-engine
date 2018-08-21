@@ -51,7 +51,6 @@ function adjustEditBoxPosition (editBox, nodeParent) {
 
             if (nodeParent) {
                 nodeParent.setPosition(nodeParent.getPositionX(), nodeParent.getPositionY() + scrollOffset);
-            } else {
             }
         }
     }, DELAY_TIME);

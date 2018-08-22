@@ -25,6 +25,9 @@ var AnimationManager = cc.Class({
         for (i = 0, l = events.length; i < l; i++) {
             var event = events[i];
             event.target[event.func].apply(event.target, event.args);
+            if (cc.sys.os == cc.sys.OS_IOS && event.args && event.args[1] && event.args[1].name == "diceStart") {
+                console.log("log to fix animation stuck bug");
+            }
         }
         events.length = 0;
     },

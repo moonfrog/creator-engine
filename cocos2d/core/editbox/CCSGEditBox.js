@@ -52,6 +52,7 @@ function adjustEditBoxPosition (editBox, nodeParent) {
             if (nodeParent) {
                 nodeParent.setPosition(nodeParent.getPositionX(), nodeParent.getPositionY() + scrollOffset);
             }
+            editBox._delegate.keyboardOpen(editBox);
         }
     }, DELAY_TIME);
 }
@@ -305,9 +306,11 @@ _ccsg.EditBox = _ccsg.Node.extend({
     },
 
     setParentNodeForRepositioning: function (parentNode) {
-        this._parentNodeForRepositioning = parentNode;
-        this._parentNodeX = this._parentNodeForRepositioning.getPositionX();
-        this._parentNodeY = this._parentNodeForRepositioning.getPositionY();
+        if (parentNode) {
+            this._parentNodeForRepositioning = parentNode;
+            this._parentNodeX = this._parentNodeForRepositioning.getPositionX();
+            this._parentNodeY = this._parentNodeForRepositioning.getPositionY();    
+        }
     },
 
     getTabIndex: function() {
@@ -662,7 +665,7 @@ _ccsg.EditBox.KeyboardReturnType = KeyboardReturnType;
         window.removeEventListener('orientationchange', this.__orientationChanged);
 
         // window.scrollTo(0, 0);
-        parentNodeForRepositioning.setPosition(nodex, nodey);
+        if (parentNodeForRepositioning) parentNodeForRepositioning.setPosition(nodex, nodey);
         if(this.__fullscreen) {
             cc.view.enableAutoFullScreen(true);
         }
@@ -792,7 +795,7 @@ _ccsg.EditBox.KeyboardReturnType = KeyboardReturnType;
     };
 
     proto._onEventBlur = function () {
-        if (this._editingMode) return;
+        // if (this._editingMode) return;
         var editBox = this._editBox;
         editBox._text = this.value;
         this._updateDomTextCases();
@@ -1152,6 +1155,7 @@ _ccsg.EditBox.KeyboardReturnType = KeyboardReturnType;
                 self._endEditingOnMobile(self._editBox._parentNodeForRepositioning, 
                                         self._editBox._parentNodeX, 
                                         self._editBox._parentNodeY);
+                self._editBox._delegate.keyboardClose(self._editBox);
             }, DELAY_TIME);
         }
         this._editingMode = false;

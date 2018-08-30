@@ -797,7 +797,9 @@ _ccsg.EditBox.KeyboardReturnType = KeyboardReturnType;
     proto._onEventBlur = function () {
         // if (this._editingMode) return;
         var editBox = this._editBox;
-        editBox._text = this.value;
+        if (this.value) {
+            editBox._text = this.value;
+        }
         this._updateDomTextCases();
 
         if (editBox._delegate && editBox._delegate.editBoxEditingDidEnded) {

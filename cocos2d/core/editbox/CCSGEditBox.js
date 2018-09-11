@@ -53,6 +53,8 @@ function adjustEditBoxPosition (editBox, nodeParent) {
                 nodeParent.setPosition(nodeParent.getPositionX(), nodeParent.getPositionY() + scrollOffset);
             }
             editBox._delegate.keyboardOpen(editBox);
+        } else if (cc.sys.os == cc.sys.OS_IOS) {
+            editBox._delegate.keyboardOpen(editBox);
         }
     }, DELAY_TIME);
 }

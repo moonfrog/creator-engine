@@ -430,6 +430,24 @@ var EditBox = cc.Class({
         editingReturn: {
             default: [],
             type: cc.Component.EventHandler
+        },
+
+        /**
+         * !#en The event handler to be called when keyboard is opened on device.
+         * @property {Component.EventHandler[]} keyboardOpen
+         */
+        keyboardOpen: {
+            default: [],
+            type: cc.Component.EventHandler   
+        },
+
+        /**
+         * !#en The event handler to be called when keyboard is opened on device.
+         * @property {Component.EventHandler[]} keyboardOpen
+         */
+        keyboardClose: {
+            default: [],
+            type: cc.Component.EventHandler   
         }
 
     },
@@ -524,6 +542,16 @@ var EditBox = cc.Class({
     editBoxEditingReturn: function() {
         cc.Component.EventHandler.emitEvents(this.editingReturn, this);
         this.node.emit('editing-return', this);
+    },
+
+    keyboardOpen: function() {
+        cc.Component.EventHandler.emitEvents(this.keyboardOpen, this);
+        this.node.emit('keyboard-open', this);
+    },
+
+    keyboardClose: function() {
+        cc.Component.EventHandler.emitEvents(this.keyboarClose, this);
+        this.node.emit('keyboard-close', this);  
     },
 
     onDestroy: function () {

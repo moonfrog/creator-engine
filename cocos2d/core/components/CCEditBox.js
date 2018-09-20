@@ -436,7 +436,7 @@ var EditBox = cc.Class({
          * !#en The event handler to be called when keyboard is opened on device.
          * @property {Component.EventHandler[]} keyboardOpen
          */
-        keyboardOpen: {
+        keyboardOpened: {
             default: [],
             type: cc.Component.EventHandler   
         },
@@ -445,7 +445,7 @@ var EditBox = cc.Class({
          * !#en The event handler to be called when keyboard is opened on device.
          * @property {Component.EventHandler[]} keyboardOpen
          */
-        keyboardClose: {
+        keyboardClosed: {
             default: [],
             type: cc.Component.EventHandler   
         }
@@ -545,12 +545,12 @@ var EditBox = cc.Class({
     },
 
     keyboardOpen: function() {
-        cc.Component.EventHandler.emitEvents(this.keyboardOpen, this);
+        cc.Component.EventHandler.emitEvents(this.keyboardOpened, this);
         this.node.emit('keyboard-open', this);
     },
 
     keyboardClose: function() {
-        cc.Component.EventHandler.emitEvents(this.keyboarClose, this);
+        cc.Component.EventHandler.emitEvents(this.keyboardClosed, this);
         this.node.emit('keyboard-close', this);  
     },
 

@@ -52,9 +52,13 @@ function adjustEditBoxPosition (editBox, nodeParent) {
             if (nodeParent) {
                 nodeParent.setPosition(nodeParent.getPositionX(), nodeParent.getPositionY() + scrollOffset);
             }
-            editBox._delegate.keyboardOpen(editBox);
+            if (editBox && editBox._delegate && editBox._delegate.keyboardOpen) {
+                editBox._delegate.keyboardOpen(editBox);
+            }
         } else if (cc.sys.os == cc.sys.OS_IOS) {
-            editBox._delegate.keyboardOpen(editBox);
+            if (editBox && editBox._delegate && editBox._delegate.keyboardOpen) {
+                editBox._delegate.keyboardOpen(editBox);
+            }
         }
     }, DELAY_TIME);
 }
@@ -1159,7 +1163,9 @@ _ccsg.EditBox.KeyboardReturnType = KeyboardReturnType;
                 self._endEditingOnMobile(self._editBox._parentNodeForRepositioning, 
                                         self._editBox._parentNodeX, 
                                         self._editBox._parentNodeY);
-                self._editBox._delegate.keyboardClose(self._editBox);
+                if (self._editBox._delegate && self._editBox._delegate.keyboardClose) {
+                    self._editBox._delegate.keyboardClose(self._editBox);
+                }
             }, DELAY_TIME);
         }
         this._editingMode = false;

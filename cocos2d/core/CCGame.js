@@ -722,7 +722,8 @@ var game = {
                 'stencil': true,
                 // MSAA is causing serious performance dropdown on some browsers.
                 'antialias': cc.macro.ENABLE_WEBGL_ANTIALIAS,
-                'alpha': cc.macro.ENABLE_TRANSPARENT_CANVAS
+                'alpha': cc.macro.ENABLE_TRANSPARENT_CANVAS,
+                'preserveDrawingBuffer': true
             };
             if (isWeChatGame) {
                 opts['preserveDrawingBuffer'] = true;
